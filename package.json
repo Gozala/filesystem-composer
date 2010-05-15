@@ -1,0 +1,34 @@
+{
+    "name": "filesystem-async",
+    "description": "CommonJS async filesystem API.",
+    "version": "0.1",
+    "keywords": ["filesystem", "async"],
+    "maintainers": [
+        {
+            "name": "Irakli Gozalishvili",
+            "email": "rfobic@gmail.com",
+            "web": "http://rfobic.wordpress.com/"
+        }
+    ],
+    "contributors": [
+    {
+            "name": "Irakli Gozalishvili",
+            "email": "rfobic@gmail.com",
+            "web": "http://rfobic.wordpress.com/"
+        }
+    ],
+    "bugs": { "web": "http://github.com/Gozala/github/issues/" },
+    "licenses": [
+        { "type": "GPL" }
+    ],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git://github.com/Gozala/filesystem.git"
+        }
+    ],
+    "directories": {
+        "lib": "lib"
+    },
+    "dependencies": {}
+}
