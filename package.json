@@ -1,8 +1,8 @@
 {
-    "name": "filesystem-async",
-    "description": "CommonJS async filesystem API.",
+    "name": "filesystem-composer",
+    "description": "CommonJS filesystem composition library.",
     "version": "0.1",
-    "keywords": ["filesystem", "async"],
+    "keywords": ["filesystem", "composer"],
     "maintainers": [
         {
             "name": "Irakli Gozalishvili",
@@ -24,7 +24,7 @@
     "repositories": [
         {
             "type": "git",
-            "url": "git://github.com/Gozala/filesystem.git"
+            "url": "git://github.com/Gozala/filesystem-composer.git"
         }
     ],
     "directories": {
