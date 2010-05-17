@@ -12,6 +12,7 @@ function _(string) {
 
 var INFO = '%@3 actual: "%@1" expected: "%@2"'
 
+// base
 ;[
     ['', '', 'Empty string yields empty response'],
     ['/', '', 'Root alone yields empty response'],
@@ -26,6 +27,7 @@ var INFO = '%@3 actual: "%@1" expected: "%@2"'
     }
 }, exports['test:base'] = {})
 
+// directory
 ;[
     ['', '.'],
     ['.', '.'],
@@ -45,43 +47,147 @@ var INFO = '%@3 actual: "%@1" expected: "%@2"'
         t.equal(actual, $[1], _(INFO, actual, $[1], $[2]))
     }
 }, exports['test:directory'] = {})
-/*
-exports['test:directory'] = function() {
-    var dir = FS.directory
-    t.equal(dir(''), '.', 'container dir of "" is "."')
-    t.equal(dir('.'), '.', 'container dir of "." is "."')
-    t.equal(dir('foo'), '.', 'container dir of "foo" is "."')
-    t.equal(dir('foo/'), '.', 'container dir of "foo/" is "."')
-    t.equal(dir('foo.txt'), '.', 'container dir of "foo.txt" is "."')
-    t.equal(dir('foo/bar/'), 'foo/', 'container dir of "." is "."')
-    t.equal(dir('foo/bar/baz.txt'), 'foo/bar/', 'container dir of ' +
-        '"foo/bar/baz.txt" is "foo/bar/"')    
-    t.equal(dir('/'), '/', 'container dir of "/" is "/"')
-    t.equal(dir('/foo.txt'), '/', 'container dir of "/foo.txt" is "/"')
-    t.equal(dir('/foo/'), '/', 'container dir of "/foo/" is "/"')
-    t.equal(dir('/foo/bar/'), '/foo/', 'container dir of "/foo/bar/" is ' +
-        '"/foo/"')
-    t.equal(dir('/foo/bar/baz.txt'), '/foo/bar/', 'directory of ' +
-        '"/foo/bar/baz.txt" is "/foo/bar/"')
-}
-
-exports['test:split'] = function() {
-    var splitext = path.split
-    t.deepEqual(splitext(''), ['', '']);
-    t.deepEqual(splitext('/'), ['/', '']);
-    t.deepEqual(splitext('/foo/bar'), ['/foo/bar', '']);
-    t.deepEqual(splitext('/foo/bar.js'), ['/foo/bar', 'js']);
-};
-*/
-exports._testParentdir = function() {
-    var parentdir = path.parentdir;
-    t.equal(parentdir(''), '', 'Empty string is empty');
-    t.equal(parentdir('/'), '', 'Root directory is empty (no parent)');
-    t.equal(parentdir('/foo/'), '/', 'Directory under root has root as parent');
-    t.equal(parentdir('/foo.txt'), '/', 'File under root has root as parent');
-    t.equal(parentdir('/foo/bar/'), '/foo/', 'directory gets proper parent');
-    t.equal(parentdir('/foo/bar/baz.txt'), '/foo/bar/', 'file gets proper parent');
-};
-
+// extension
+;[
+    ['', ''],
+    ['.', ''],
+    ['..', ''],
+    ['.a', ''],
+    ['..a', ''],
+    ['.a.b', '.b'],
+    ['a.b', '.b'],
+    ['a.b.c', '.c'],
+    ['/', ''],
+    ['/.', ''],
+    ['/..', ''],
+    ['/..a', ''],
+    ['/.a.b', '.b'],
+    ['/a.b', '.b'],
+    ['/a.b.c', '.c'],
+    ['foo/', ''],
+    ['foo/.', ''],
+    ['foo/..', ''],
+    ['foo/..a', ''],
+    ['foo/.a.b', '.b'],
+    ['foo/a.b', '.b'],
+    ['foo/a.b.c', '.c'],
+    ['/foo/', ''],
+    ['/foo/.', ''],
+    ['/foo/..', ''],
+    ['/foo/..a', ''],
+    ['/foo/.a.b', '.b'],
+    ['/foo/a.b', '.b'],
+    ['/foo/a.b.c', '.c']
+].forEach(function($) {
+    this[_('test:FS.extension("%@") === "%@"', $[0], $[1])] = function() {
+        var actual = FS.extension($[0])
+        t.equal(actual, $[1], _(INFO, actual, $[1], $[2]))
+    }
+}, exports['test:extension'] = {})
+// normal
+;[
+    ['', ''],
+    ['.', ''],
+    ['./', ''],
+    ['../', '../'],
+    ['../a', '../a'],
+    ['../a/', '../a/'],
+    ['a/..', ''],
+    ['a/../', ''],
+    ['a/../b', 'b'],
+    ['a/../b/', 'b/'],
+    ['a/../../', '../'],
+    ['a/../../b', '../b'],
+    ['./../', '../']
+].forEach(function($) {
+    this[_('test:FS.normal("%@") === "%@"', $[0], $[1])] = function() {
+        var actual = FS.normal($[0])
+        t.equal(actual, $[1], _(INFO, actual, $[1], $[2]))
+    }
+}, exports['test:normal'] = {})
+// relative
+;[
+    ['', '', ''],
+    ['.', '', ''],
+    ['', '.', ''],
+    ['.', '.', ''],
+    ['', '..', '../'],
+    ['', '../', '../'],
+    ['a', 'b', 'b'],
+    ['../a', '../b', 'b'],
+    ['../a/b', '../a/c', 'c'],
+    ['a/b', '..', '../../'],
+    ['a/b', 'c', '../c'],
+    ['a/b', 'c/d', '../c/d'],
+    ["a", "a/b/c", "a/b/c"],
+    ["a/", "a/b/c", "b/c"]
+].forEach(function($) {
+    this[_('test:FS.relative("%@", "%@") === "%@"', $[0], $[1], $[2])] = function() {
+        var actual = FS.relative($[0], $[1])
+        t.equal(actual, $[2], _(INFO, actual, $[2], $[3]))
+    }
+}, exports['test:relative'] = {})
+// resolve
+;[
+    [['/'], '/'],
+    [['/a'], '/a'],
+    [['/a/'], '/a/'], 
+    [['/a', '/b'], '/b'], 
+    [['/a', '/b/'], '/b/'], 
+    [['/', 'a'], '/a'],
+    [['/', 'a/'], '/a/'],
+    [['/a', 'a'], '/a'],
+    [['/a', 'a/'], '/a/'],
+    [['/a/', 'a'], '/a/a'],
+    [['/a/', 'a/'], '/a/a/'],
+    [['..'], '../'],
+    [['..', 'a'], '../a'],
+    [['..', 'a/'], '../a/'],
+    [['.'], ''],
+    [['.', 'a'], 'a'],
+    [['.', 'a/'], 'a/'],
+    [['a', '.'], ''],
+    [['a', '.', 'a'], 'a'],
+    [['a', '.', 'a/'], 'a/'],
+    [['a', '..'], '../'],
+    [['a', '..', 'a'], '../a'],
+    [['a', '..', 'a/'], '../a/'],
+    [['a/', '..'], ''],
+    [['a/', '..', 'a'], 'a'],
+    [['a/', '..', 'a/'], 'a/'],
+    [['a/b', ''], 'a/b'],
+].forEach(function($) {
+    this[_('test:FS.resolve.apply(null, "%@") === "%@"', $[0], $[1])] = function() {
+        var actual = FS.resolve.apply(null, $[0])
+        t.equal(actual, $[1], _(INFO, actual, $[1], $[2]))
+    }
+}, exports['test:resolve'] = {})
+// path join
+;[
+    ['/', 'a', '/a'],
+    ['.', 'a', 'a'],
+    ['.', '..', '../'],
+    ['.', '../', '../']
+].forEach(function($) {
+    this[_('test:FS.path("%@").join("%@") === "%@"', $[0], $[1], $[2])] = function() {
+        var actual = FS.path($[0]).join($[1])
+        t.equal(actual, $[2], _(INFO, actual, $[2], $[3]))
+    }
+}, exports['test:path'] = {})
+// split
+;[
+    ['',[]],
+    ['foo/bar/', ['foo','bar','']],
+    ['foo/bar', ['foo','bar']],
+    ['/', ['','']],
+    ['/foo/bar', ['','foo','bar']],
+    ['/foo/bar/', ['','foo','bar','']],
+    ['/foo/bar.js', ['','foo','bar.js']]
+].forEach(function($) {
+    this[_('test:FS.split("%@") ~= [%@]', $[0], $[1])] = function() {
+        var actual = FS.split($[0])
+        t.deepEqual(actual, $[1], _(INFO, actual, $[1], $[2]))
+    }
+}, exports['test:split'] = {})
 
 if (require.main == module) require('test/runner').run(exports)
