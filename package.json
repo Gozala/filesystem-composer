@@ -19,7 +19,9 @@
     ],
     "bugs": { "web": "http://github.com/Gozala/github/issues/" },
     "licenses": [
-        { "type": "GPL" }
+        { "type": "MPL 1.1" },
+        { "type": "GPL 2.0" },
+        { "type": "LGPL 2.1" }
     ],
     "repositories": [
         {
