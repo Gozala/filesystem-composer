@@ -1,6 +1,6 @@
 { "name": "filesystem-composer"
 , "description": "Library for composing promise based filesystems."
-, "version": "0.0.1"
+, "version": "0.0.2"
 , "dependencies":
   {
     "q": ">=0.0.0"
