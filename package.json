@@ -2,20 +2,25 @@
 , "description": "Library for composing promise based filesystems."
 , "version": "0.0.2"
 , "dependencies":
-  {
-    "q": ">=0.0.0"
+  { "q": ">=0.0.0"
+  , "light-traits": ">=0.0.3"
+  , "test": ">=0.0.5"
   }
+, "directories":
+  { "doc": "./doc"
+  , "man": "./man"
+  , "lib": "./lib"
+  }
+, "main": "./lib/fs"
+, "scripts": { "test": "node test/all.js" }
 , "homepage": "http://github.com/Gozala/filesystem-composer/"
 , "author": "Irakli Gozalishvili <rfobic@gmail.com> (http://jeditoolkit.com)"
-, "contributors":
-  [ "Irakli Gozalishvili <rfobic@gmail.com> (http://jeditoolkit.com)"
-  ]
+, "contributors": [ "Irakli Gozalishvili <rfobic@gmail.com> (http://jeditoolkit.com)" ]
 , "repository":
   { "type": "git"
   , "url": "git://github.com/Gozala/filesystem-composer.git"
   }
 , "bugs": { "web": "http://github.com/Gozala/filesystem-composer/issues/" }
-, "directories": { "doc": "./doc", "man": "./man", "lib": "./lib" }
 , "engines": { "node": ">=0.1.103" }
 , "licenses": [ { "type": "MPL 1.1" } ]
 }
