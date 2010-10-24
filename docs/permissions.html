@@ -1,0 +1,129 @@
+<!DOCTYPE html>  <html> <head>   <title>permissions.js</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="attributes.html">                 attributes.js               </a>                                           <a class="source" href="directories.html">                 directories.js               </a>                                           <a class="source" href="files.html">                 files.js               </a>                                           <a class="source" href="fs-base.html">                 fs-base.js               </a>                                           <a class="source" href="fs.html">                 fs.js               </a>                                           <a class="source" href="listing.html">                 listing.js               </a>                                           <a class="source" href="paths.html">                 paths.js               </a>                                           <a class="source" href="permissions.html">                 permissions.js               </a>                                           <a class="source" href="tests.html">                 tests.js               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               permissions.js             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-1">#</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="cm">/*spec</span>
+
+<span class="cm">= Specification =</span>
+
+<span class="cm">== Types ==</span>
+
+<span class="cm">Arguments used throughout this document will have the following types, unless</span>
+<span class="cm">explicitly specified otherwise:</span>
+
+<span class="cm">* &#39;&#39;&#39;path&#39;&#39;&#39; is either a String, an Object with a toString() method, or an</span>
+<span class="cm">Object with a valueOf() method that returns an Object with a toString() method.</span>
+<span class="cm">In the case where path is an Object, the object must return the same string</span>
+<span class="cm">for the same path on the same system, provided the path in canonicalizable.</span>
+
+<span class="cm">* &#39;&#39;&#39;mode&#39;&#39;&#39; is an Object describing the open mode for a file. Each property</span>
+<span class="cm">is subject to a true or falsey test. Meaningful properties include read,</span>
+<span class="cm">write, append, truncate, create, and exclusive. &#39;&#39;Note: any value is</span>
+<span class="cm">equivalent to false if the property is omitted.&#39;&#39;</span>
+
+<span class="cm">* &#39;&#39;&#39;permissions&#39;&#39;&#39; is an instance of Permissions, or a duck-type thereof.</span>
+
+<span class="cm">The &quot;fs-base&quot; module exports the following constructors:</span>
+
+<span class="cm">* &#39;&#39;&#39;Permissions&#39;&#39;&#39;, a class that describes file system permissions. Instances</span>
+<span class="cm">of Permissions are initially deep copies of all transitively owned properties</span>
+<span class="cm">of Permissions.default and have a eponymous property for the optional</span>
+<span class="cm">&quot;constructor&quot; argument of the constructor.</span>
+<span class="cm">** Mandatory properties on all platforms are Boolean values owner.read and</span>
+<span class="cm">owner.write.</span>
+<span class="cm">** Mandatory properties on UNIX platforms platforms are Boolean values</span>
+<span class="cm">owner.{read, write, execute}, group.{read, write, execute} and other.{read,</span>
+<span class="cm">write, execute}.</span>
+<span class="cm">** Permissions.default must initially reflect the current default file</span>
+<span class="cm">creation permissions in the host environment; i.e. in a UNIX environment,</span>
+<span class="cm">Permissions.default would reflect the inverse of umask. Where this is not</span>
+<span class="cm">possible, compliant implementations must initialize Permissions.default to</span>
+<span class="cm">{{owner: {read: true, write: true}}</span>
+
+<span class="cm">*/</span>
+<span class="kd">var</span> <span class="nx">_slice</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span>
+<span class="cm">/**</span>
+<span class="cm">*/</span>
+<span class="nx">exports</span><span class="p">.</span><span class="nx">UNIX_BITS</span> <span class="o">=</span> <span class="nx">UNIX_BITS</span>
+<span class="kd">var</span> <span class="nx">UNIX_BITS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;setUid&quot;</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;setGid&quot;</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;sticky&quot;</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;owner&quot;</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;owner&quot;</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;owner&quot;</span><span class="p">,</span> <span class="s2">&quot;execute&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="s2">&quot;execute&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="s2">&quot;execute&quot;</span><span class="p">]</span>
+<span class="p">]</span>
+<span class="cm">/**</span>
+<span class="cm">*/</span>
+<span class="nx">exports</span><span class="p">.</span><span class="nx">Permissions</span> <span class="o">=</span> <span class="nx">Permissions</span>
+<span class="kd">function</span> <span class="nx">Permissions</span><span class="p">(</span><span class="nx">permissions</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">Permissions</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]).</span><span class="nx">update</span><span class="p">(</span><span class="nx">permissions</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="cm">/**</span>
+<span class="cm">    #beyond_spec</span>
+<span class="cm">*/</span>
+<span class="nx">Permissions</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">constructor</span><span class="o">:</span> <span class="nx">Permissions</span><span class="p">,</span>
+    <span class="nx">update</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">update</span><span class="p">(</span><span class="nx">permissions</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">permissions</span> <span class="o">==</span> <span class="s2">&quot;number&quot;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">bits</span> <span class="o">=</span> <span class="nx">_slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">permissions</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+            <span class="kd">var</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">UNIX_BITS</span><span class="p">.</span><span class="nx">length</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-2">#</a>               </div>               <p>filling missing bits</p>             </td>             <td class="code">               <div class="highlight"><pre>            <span class="k">while</span><span class="p">(</span><span class="nx">bits</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="nx">l</span><span class="p">)</span> <span class="nx">bits</span><span class="p">.</span><span class="nx">unshift</span><span class="p">(</span><span class="kc">undefined</span><span class="p">)</span>
+            <span class="k">while</span><span class="p">(</span><span class="mi">0</span> <span class="o">&gt;=</span> <span class="o">--</span><span class="nx">l</span><span class="p">)</span> 
+                <span class="k">this</span><span class="p">.</span><span class="nx">grant</span><span class="p">(</span><span class="nx">UNIX_BITS</span><span class="p">[</span><span class="nx">l</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nx">UNIX_BITS</span><span class="p">[</span><span class="nx">l</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="nx">bits</span><span class="p">[</span><span class="nx">l</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">permissions</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">userPermissions</span> <span class="o">=</span> <span class="k">this</span><span class="p">[</span><span class="nx">user</span><span class="p">]</span> <span class="o">||</span> <span class="p">(</span><span class="k">this</span><span class="p">[</span><span class="nx">user</span><span class="p">]</span> <span class="o">=</span> <span class="p">{})</span>
+            <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">permissions</span><span class="p">[</span><span class="nx">user</span><span class="p">]).</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">permission</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">userPermissions</span><span class="p">[</span><span class="nx">permission</span><span class="p">]</span> <span class="o">=</span> <span class="nx">permissions</span><span class="p">[</span><span class="nx">user</span><span class="p">][</span><span class="nx">permissions</span><span class="p">]</span>
+            <span class="p">},</span> <span class="k">this</span><span class="p">)</span>
+        <span class="p">},</span> <span class="k">this</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">this</span>
+    <span class="p">},</span>
+    <span class="cm">/**</span>
+<span class="cm">        #beyond_spec</span>
+<span class="cm">    */</span>
+    <span class="nx">grant</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">grant</span><span class="p">(</span><span class="nx">what</span><span class="p">,</span> <span class="nx">permission</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="kc">undefined</span> <span class="o">===</span> <span class="nx">value</span><span class="p">)</span> <span class="nx">value</span> <span class="o">=</span> <span class="kc">true</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">permission</span><span class="p">)</span> <span class="k">this</span><span class="p">[</span><span class="nx">what</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span>
+        <span class="k">else</span> <span class="p">(</span><span class="k">this</span><span class="p">[</span><span class="nx">what</span><span class="p">]</span> <span class="o">=</span> <span class="k">this</span><span class="p">[</span><span class="nx">what</span><span class="p">]</span> <span class="o">||</span> <span class="p">{})[</span><span class="nx">permission</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span>
+    <span class="p">},</span>
+    <span class="cm">/**</span>
+<span class="cm">        #beyond_spec</span>
+<span class="cm">    */</span>
+    <span class="nx">deny</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">deny</span><span class="p">(</span><span class="nx">what</span><span class="p">,</span> <span class="nx">permission</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="kc">undefined</span> <span class="o">===</span> <span class="nx">value</span><span class="p">)</span> <span class="nx">value</span> <span class="o">=</span> <span class="kc">false</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">permission</span><span class="p">)</span> <span class="k">this</span><span class="p">[</span><span class="nx">what</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span>
+        <span class="k">else</span> <span class="p">(</span><span class="k">this</span><span class="p">[</span><span class="nx">what</span><span class="p">]</span> <span class="o">=</span> <span class="k">this</span><span class="p">[</span><span class="nx">what</span><span class="p">]</span> <span class="o">||</span> <span class="p">{})[</span><span class="nx">permission</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span>
+    <span class="p">},</span>
+    <span class="cm">/**</span>
+<span class="cm">        #beyond_spec</span>
+<span class="cm">    */</span>
+    <span class="nx">can</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">can</span><span class="p">(</span><span class="nx">what</span><span class="p">,</span> <span class="nx">permission</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">permission</span><span class="p">)</span> <span class="k">return</span> <span class="o">!!</span><span class="k">this</span><span class="p">[</span><span class="nx">what</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">[</span><span class="nx">what</span><span class="p">])</span> <span class="k">return</span> <span class="kc">false</span>
+        <span class="k">return</span> <span class="o">!!</span><span class="k">this</span><span class="p">[</span><span class="nx">what</span><span class="p">][</span><span class="nx">permission</span><span class="p">]</span>
+    <span class="p">},</span>
+    <span class="cm">/**</span>
+<span class="cm">        #beyond_spec</span>
+<span class="cm">    */</span>
+    <span class="nx">toUnix</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">toUnix</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">UNIX_BITS</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">$</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">can</span><span class="p">(</span><span class="nx">$</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">$</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">?</span> <span class="s1">&#39;1&#39;</span> <span class="o">:</span> <span class="s1">&#39;0&#39;</span>
+        <span class="p">},</span> <span class="k">this</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="cm">/***</span>
+<span class="cm">*/</span>
+<span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">Permissions</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-3">#</a>               </div>               <p>avoid infinite recursion by bypassing the constructor</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="kd">var</span> <span class="nx">permissions</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">Permissions</span><span class="p">.</span><span class="nx">prototype</span><span class="p">)</span>
+        <span class="nx">permissions</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="o">~</span><span class="nx">process</span><span class="p">.</span><span class="nx">umask</span><span class="p">()</span> <span class="o">&amp;</span> <span class="mi">0666</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nx">permissions</span><span class="p">;</span>
+    <span class="p">},</span>
+    <span class="nx">set</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">permissions</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Permissions</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span>
+        <span class="nx">process</span><span class="p">.</span><span class="nx">umask</span><span class="p">(</span><span class="o">~</span><span class="nx">permissions</span><span class="p">.</span><span class="nx">toUnix</span><span class="p">()</span> <span class="o">&amp;</span> <span class="mi">0666</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">})</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

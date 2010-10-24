@@ -1,0 +1,49 @@
+<!DOCTYPE html>  <html> <head>   <title>listing.js</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="attributes.html">                 attributes.js               </a>                                           <a class="source" href="directories.html">                 directories.js               </a>                                           <a class="source" href="files.html">                 files.js               </a>                                           <a class="source" href="fs-base.html">                 fs-base.js               </a>                                           <a class="source" href="fs.html">                 fs.js               </a>                                           <a class="source" href="listing.html">                 listing.js               </a>                                           <a class="source" href="paths.html">                 paths.js               </a>                                           <a class="source" href="permissions.html">                 permissions.js               </a>                                           <a class="source" href="tests.html">                 tests.js               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               listing.js             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-1">#</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="s1">&#39;use strict&#39;</span>
+
+<span class="kd">var</span> <span class="nx">Trait</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;light-traits&#39;</span><span class="p">).</span><span class="nx">Trait</span>
+<span class="p">,</span>   <span class="nx">all</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;promised-utils&#39;</span><span class="p">).</span><span class="nx">all</span>
+<span class="p">,</span>   <span class="nx">Q</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">),</span> <span class="nx">when</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">when</span><span class="p">,</span> <span class="nx">asap</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">asap</span><span class="p">,</span> <span class="nx">defer</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">defer</span>
+<span class="p">,</span>   <span class="nx">Callback</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./utils/promised&#39;</span><span class="p">).</span><span class="nx">Callback</span>
+
+<span class="nx">exports</span><span class="p">.</span><span class="nx">FSListTrait</span> <span class="o">=</span> <span class="nx">Trait</span><span class="p">(</span>
+<span class="p">{</span> <span class="nx">_list</span><span class="o">:</span> <span class="nx">Trait</span><span class="p">.</span><span class="nx">required</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-2">#</a>               </div>               <p>returns the names of all the files in a directory, in lexically
+sorted order. Throws an exception if the directory cannot be
+traversed (or path is not a directory). <br />
+Note: this means that <code>list("x")</code> of a directory containing <code>"a"</code>
+and <code>"b"</code> would return <code>["a", "b"]</code>, not <code>["x/a", "x/b"]</code>.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="cm">/**</span>
+<span class="cm">   * @param {String(Promise|Path)|String} path</span>
+<span class="cm">   * @returns {Promise &lt;&lt; String[]}</span>
+<span class="cm">   */</span>
+<span class="p">,</span> <span class="nx">list</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">list</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">defer</span><span class="p">()</span>
+    <span class="nx">asap</span>
+    <span class="p">(</span> <span class="nx">path</span>
+    <span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">_list</span><span class="p">(</span><span class="s1">&#39;&#39;</span> <span class="o">+</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">Callback</span><span class="p">(</span><span class="nx">deferred</span><span class="p">))</span>
+      <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+    <span class="p">,</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">reject</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span>
+  <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-3">#</a>               </div>               <p>returns an Array that starts with the given path, and all of the
+paths relative to the given path, discovered by a depth first
+traversal of every directory in any visited directory, reporting
+but not traversing symbolic links to directories, in lexically
+sorted order within directories. The first path is always "", the
+path relative to itself.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="cm">/**</span>
+<span class="cm">   * @param {String(Promise|Path)|String} path</span>
+<span class="cm">   * @returns {Promise &lt;&lt; String[]}</span>
+<span class="cm">   */</span>
+<span class="p">,</span> <span class="nx">listTree</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">listTree</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="octowrap">                 <a class="octothorpe" href="#section-4">#</a>               </div>               <p>returns an Array that starts with the given directory, and all the
+directories relative to the given path, discovered by a depth
+first traversal of every directory in any visited directory, not
+traversing symbolic links to directories, in lexically sorted
+order within directories. </p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="cm">/**</span>
+<span class="cm">   * @param {String(Promise|Path)|String} path</span>
+<span class="cm">   * @returns {Promise &lt;&lt; String[]}</span>
+<span class="cm">   */</span>
+<span class="p">,</span> <span class="nx">listDirectoryTree</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">listDirectoryTree</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
