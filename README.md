@@ -18,7 +18,7 @@ For more details check [documentation].
 
     npm test filesystem-composer
 
-[documentation]:http://jeditoolkit.com/filesystem-composer/docs
+[documentation]:http://jeditoolkit.com/filesystem-composer/docs/fs.html
 [promised-fs]:http://github.com/Gozala/promised-fs
 [commonjs]:http://commonjs.org/
 [filesystem API]:http://wiki.commonjs.org/wiki/Filesystem/A
