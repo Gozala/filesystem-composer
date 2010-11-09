@@ -1,10 +1,10 @@
 { "name": "filesystem-composer"
 , "description": "Library for composing promise based filesystems."
-, "version": "0.0.5"
+, "version": "0.0.6"
 , "dependencies":
-  { "q": ">=0.0.0"
+  { "q": ">=0.1.0"
   , "light-traits": ">=0.0.3"
-  , "test": ">=0.0.5"
+  , "test": ">=0.0.8"
   , "promised-traits": ">=0.0.1"
   }
 , "directories":
