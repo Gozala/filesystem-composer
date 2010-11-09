@@ -13,7 +13,6 @@
   , "lib": "./lib"
   }
 , "main": "./lib/filesystem-composer"
-, "scripts": { "test": "node test/all.js" }
 , "homepage": "http://github.com/Gozala/filesystem-composer/"
 , "author": "Irakli Gozalishvili <rfobic@gmail.com> (http://jeditoolkit.com)"
 , "contributors": [ "Irakli Gozalishvili <rfobic@gmail.com> (http://jeditoolkit.com)" ]
