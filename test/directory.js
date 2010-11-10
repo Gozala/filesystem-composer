@@ -87,10 +87,23 @@ exports.create = function create(fs) {
       when
       ( fs.makeTree(path)
       , function() {
-          console.log('>>>')
+          when
+          ( fs.isDirectory(path)
+          , function(isDirectory) {
+              assert.ok(isDirectory, 'directory tree is created')
+              var path = fs.join(tempDir, 'test4')
+              when
+              ( fs.removeTree(path)
+              , done
+              , function(reason) {
+                  done(assert.fail('failed to cleanup. Can not remove directory:' + path))
+                }
+              )
+            }
+          )
         }
       , function(reason) {
-          done(assert.fail('was no able to create tree: ' + reason))
+          done(assert.fail('failed to create tree: ' + reason))
         }
       )
     }
