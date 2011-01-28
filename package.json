@@ -2,11 +2,11 @@
 , "description": "Library for composing promise based filesystems."
 , "version": "0.0.9"
 , "dependencies":
-  { "q": ">=0.1.0"
+  { "q": ">=0.2.5"
   , "light-traits": ">=0.0.5"
   , "test": ">=0.0.10"
-  , "promised-traits": ">=0.0.1"
-  , "promised-utils": ">=0.0.3"
+  , "promised-traits": ">=0.0.4"
+  , "promised-utils": ">=0.0.8"
   }
 , "directories":
   { "doc": "./doc"
