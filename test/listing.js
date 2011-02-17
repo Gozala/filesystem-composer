@@ -1,7 +1,7 @@
 'use strict'
 
 var q = require('q'), when = q.when
-  , tempDir = require('./fixtures').tempDir
+var tempDir = require('./fixtures').tempDir
 
 function areElementsInArraysSame(source, target) {
   var value = true
