@@ -4,7 +4,7 @@
 , "dependencies":
   { "q": ">=0.2.5"
   , "light-traits": ">=0.0.5"
-  , "test": ">=0.0.10"
+  , "test": ">=0.0.11"
   , "promised-traits": ">=0.0.4"
   , "promised-utils": ">=0.0.8"
   }
