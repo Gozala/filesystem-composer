@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/Gozala/filesystem-composer.png)](http://travis-ci.org/Gozala/filesystem-composer)
 filesystem-composer
 ===================
 
